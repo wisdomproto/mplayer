@@ -1,0 +1,39 @@
+data/
+__pycache__/
+*.log
+
+# Runtime data, downloads and caches
+tmp/
+cache/
+.pytest_cache/
+.venv/
+venv/
+*.py[cod]
+*.db
+*.db-*
+*.sqlite*
+*.part
+*.ytdl
+
+# Media stays outside Git (audio storage will use R2)
+*.mp3
+*.m4a
+*.webm
+*.opus
+*.ogg
+*.wav
+*.flac
+*.aac
+*.mp4
+*.mkv
+*.mov
+*.png
+*.jpg
+*.jpeg
+
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
