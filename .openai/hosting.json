@@ -1,7 +1,5 @@
 {
   "d1": null,
-  "r2": {
-    "binding": "BUCKET"
-  },
+  "r2": "BUCKET",
   "project_id": "appgprj_6aee88e440c48191acec61e182a3ce3d"
 }
