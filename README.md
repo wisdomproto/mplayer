@@ -4,6 +4,12 @@
 
 이 저장소에는 소스와 선곡 목록만 포함합니다. MP3 등 미디어, 보관함 DB, 다운로드 기록, 캐시와 인증 정보는 Git에서 제외합니다. R2 음원 저장소 연결은 추후 설정할 예정이며 현재는 로컬 파일을 사용합니다.
 
+## 웹 플레이어
+
+[Mplayer 웹](https://mplayer-wisdomproto.kil210.chatgpt.site)은 ChatGPT Sites에 비공개로 배포했습니다. ChatGPT로 로그인하면 사용할 수 있습니다. 웹 배포용 소스는 이 저장소의 [`sites` 브랜치](https://github.com/wisdomproto/mplayer/tree/sites)에 있으며, Sites에서 제공하는 R2에 MP3와 보관함 변경 사항·재생목록을 저장합니다. MP3는 Git에 포함하지 않습니다. 이 `main` 브랜치는 기존 PC 앱입니다.
+
+웹에서는 재생·위치 이동·보관함 검색·좋아요·곡 정보 수정·재생목록·MP3 업로드를 지원합니다. 유튜브 다운로드·변환·곡 자르기는 아래 PC 앱에서 이용하세요. PC 앱과 웹의 보관함 변경 사항은 자동 동기화하지 않습니다.
+
 ## 실행
 
 Windows에서 `start.cmd`를 더블 클릭하거나 다음을 실행하세요.

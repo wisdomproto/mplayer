@@ -37,3 +37,6 @@ venv/
 !.env.example
 *.pem
 *.key
+
+# Sites has its own managed source checkout (GitHub branch: sites)
+/sites/
