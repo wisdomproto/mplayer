@@ -17,11 +17,11 @@ test('R2 media supports prefix, suffix, end clamping and invalid ranges',async()
  const head=await worker.fetch(req('/media/'+id,{method:'HEAD'}),{BUCKET});assert.equal(head.headers.get('Content-Length'),'10');assert.equal(await head.text(),'');
 });
 test('library seeded playlists survive edits and cross-origin writes are rejected',async()=>{
- const BUCKET=new Bucket();let r=await worker.fetch(req('/api/library'),{BUCKET});const initial=await r.json();assert.equal(initial.tracks.length,854);assert.deepEqual(initial.playlists.map(p=>p.tracks.length),[40,100,100,100,100,100,314]);
+ const BUCKET=new Bucket();let r=await worker.fetch(req('/api/library'),{BUCKET});const initial=await r.json();assert.equal(initial.tracks.length,894);assert.deepEqual(initial.playlists.map(p=>p.tracks.length),[40,100,100,100,100,100,314,10,16,10,10]);
  r=await worker.fetch(req('/api/like',{method:'POST',headers:{Origin:'https://evil.test'},body:'{}'}),{BUCKET});assert.equal(r.status,403);
  const id=initial.tracks[0].id;
  r=await worker.fetch(req('/api/like',{method:'POST',body:JSON.stringify({id,liked:true})}),{BUCKET});assert.equal(r.status,200);
  r=await worker.fetch(req('/api/library'),{BUCKET});assert.equal((await r.json()).tracks.find(t=>t.id===id).liked,true);
  r=await worker.fetch(req('/api/playlists',{method:'POST',body:JSON.stringify({playlists:[{id:'test',name:'My collection',tracks:[id,id]}]})}),{BUCKET});assert.equal(r.status,200);
- r=await worker.fetch(req('/api/library'),{BUCKET});assert.deepEqual((await r.json()).playlists,[{id:'test',name:'My collection',tracks:[id]}]);
+ r=await worker.fetch(req('/api/library'),{BUCKET});assert.deepEqual((await r.json()).playlists,[{id:'test',name:'My collection',tracks:[id]},...initial.playlists]);
 });

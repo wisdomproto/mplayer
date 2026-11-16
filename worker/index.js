@@ -3,7 +3,14 @@ const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{stat
 const validId=id=>/^[a-f0-9]{32}$/.test(id);
 const error=(message,status=400)=>{throw Object.assign(new Error(message),{status});};
 async function listing(bucket,prefix){let out=[],cursor;do{const page=await bucket.list({prefix,cursor,limit:1000});out.push(...page.objects);cursor=page.truncated?page.cursor:undefined;}while(cursor);return out;}
-async function state(bucket){const obj=await bucket.get('state/library.json');return {value:obj?await obj.json():{overrides:{},playlists:seed.playlists},etag:obj?.etag};}
+async function state(bucket){
+ const obj=await bucket.get('state/library.json');
+ const value=obj?await obj.json():{overrides:{},playlists:[]};
+ const ids=new Set(value.playlists.map(p=>p.id));
+ const names=new Set(value.playlists.map(p=>p.name));
+ value.playlists=[...value.playlists,...seed.playlists.filter(p=>!ids.has(p.id)&&!names.has(p.name))];
+ return {value,etag:obj?.etag};
+}
 async function update(bucket,modify){for(let i=0;i<5;i++){const s=await state(bucket);const result=modify(s.value);const saved=await bucket.put('state/library.json',JSON.stringify(s.value),{httpMetadata:{contentType:'application/json'},onlyIf:s.etag?{etagMatches:s.etag}:{etagDoesNotMatch:'*'}});if(saved)return result;}error('다른 기기에서 변경 중입니다. 다시 시도해 주세요.',409);}
 async function library(bucket){const [s,media,custom]=await Promise.all([state(bucket),listing(bucket,'audio/'),listing(bucket,'tracks/')]);const available=new Set(media.map(o=>o.key.slice(6,-4)));const extras=await Promise.all(custom.map(async o=>(await bucket.get(o.key)).json()));return {tracks:[...seed.tracks,...extras].map(t=>({...t,...s.value.overrides[t.id],available:available.has(t.id)})),playlists:s.value.playlists,uploaded:available.size,total:seed.tracks.length+extras.length};}
 async function media(request,bucket,id){const key='audio/'+id+'.mp3';const head=await bucket.head(key);if(!head)return json({error:'음원을 업로드하고 있습니다. 잠시 후 다시 재생해 주세요.'},404);const headers=new Headers({'Content-Type':'audio/mpeg','Accept-Ranges':'bytes','ETag':head.httpEtag,'Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff'});let start=0,end=head.size-1,status=200;const range=request.headers.get('Range');if(range){const m=/^bytes=(\d*)-(\d*)$/.exec(range);if(!m||(!m[1]&&!m[2]))return new Response(null,{status:416,headers:{'Content-Range':`bytes */${head.size}`}});if(!m[1])start=Math.max(0,head.size-Number(m[2]));else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}if(start>end||start>=head.size)return new Response(null,{status:416,headers:{'Content-Range':`bytes */${head.size}`}});status=206;headers.set('Content-Range',`bytes ${start}-${end}/${head.size}`);}headers.set('Content-Length',String(end-start+1));if(request.method==='HEAD')return new Response(null,{status,headers});const obj=await bucket.get(key,{range:{offset:start,length:end-start+1}});return new Response(obj.body,{status,headers});}
