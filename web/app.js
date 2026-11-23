@@ -118,8 +118,20 @@ $('#seek').oninput = e => { if (Number.isFinite(audio.duration)) audio.currentTi
 $('#volume').oninput = e => { audio.volume = +e.target.value; audio.muted = false; $('#mute').textContent = '♪'; };
 $('#mute').onclick = () => { audio.muted = !audio.muted; $('#mute').textContent = audio.muted ? '×' : '♪'; };
 $('#now-like').onclick = guarded(async () => { if (current) await like(current); });
-$('#shuffle').onclick = () => { shuffle = !shuffle; $('#shuffle').classList.toggle('on',shuffle); toast(shuffle ? '셔플 재생 켜짐' : '셔플 재생 꺼짐'); };
+$('#shuffle').onclick = () => { shuffle = !shuffle; $('#shuffle').classList.toggle('on',shuffle); $('#shuffle').setAttribute('aria-pressed',String(shuffle)); toast(shuffle ? '셔플 재생 켜짐' : '셔플 재생 꺼짐'); };
 $('#repeat').onclick = () => { repeat = (repeat+1)%3; $('#repeat').classList.toggle('on',!!repeat); $('#repeat').textContent = repeat === 2 ? '↻¹' : '↻'; $('#repeat').title = ['반복: 꺼짐','반복: 전체','반복: 한 곡'][repeat]; toast($('#repeat').title); };
+async function playAllRandom() {
+  const list = tracks.filter(t => t.available !== false);
+  if (!list.length) return toast('재생할 음원이 없습니다.');
+  const first = list[Math.floor(Math.random() * list.length)];
+  shuffle = true; repeat = 0;
+  $('#shuffle').classList.add('on'); $('#shuffle').setAttribute('aria-pressed','true');
+  $('#repeat').classList.remove('on'); $('#repeat').textContent = '↻'; $('#repeat').title = '반복: 꺼짐';
+  if (current?.id === first.id) audio.currentTime = 0;
+  await playTrack(first, list);
+  toast('전체 '+list.length+'개 음원을 랜덤 재생합니다.');
+}
+$('#shuffle-all').onclick = guarded(playAllRandom);
 $('#hero-play').onclick = guarded(async () => { const artistTracks=tracks.filter(t=>t.artist==='이승환'); if (!artistTracks.length) return searchArtist('이승환 official'); await playTrack(artistTracks[0],artistTracks); });
 $('#queue-button').onclick = () => {
   $('#queue-list').innerHTML = queue.length ? queue.map((id,i) => { const t = tracks.find(t => t.id === id); return t ? `<button class="queue-item" data-id="${id}">${current?.id === id?'♫':i+1} · ${esc(t.title)}<small>${esc(t.artist)}</small></button>`:''; }).join('') : '<p class="muted">곡을 재생하면 대기열이 표시됩니다.</p>';
