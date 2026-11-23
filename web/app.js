@@ -116,15 +116,15 @@ $('#now-like').onclick = guarded(async () => { if (current) await like(current);
 $('#shuffle').onclick = () => { shuffle = !shuffle; $('#shuffle').classList.toggle('on',shuffle); $('#shuffle').setAttribute('aria-pressed',String(shuffle)); toast(shuffle ? '셔플 재생 켜짐' : '셔플 재생 꺼짐'); };
 $('#repeat').onclick = () => { repeat = (repeat+1)%3; $('#repeat').classList.toggle('on',!!repeat); $('#repeat').textContent = repeat === 2 ? '↻¹' : '↻'; $('#repeat').title = ['반복: 꺼짐','반복: 전체','반복: 한 곡'][repeat]; toast($('#repeat').title); };
 async function playAllRandom() {
-  const list = tracks.filter(t => t.available !== false);
-  if (!list.length) return toast('재생할 음원이 없습니다.');
+  const list = tracks.filter(t => t.available !== false && t.album !== '지대넓얕 팟캐스트' && t.artist !== '지대넓얕');
+  if (!list.length) return toast('재생할 노래가 없습니다.');
   const first = list[Math.floor(Math.random() * list.length)];
   shuffle = true; repeat = 0;
   $('#shuffle').classList.add('on'); $('#shuffle').setAttribute('aria-pressed','true');
   $('#repeat').classList.remove('on'); $('#repeat').textContent = '↻'; $('#repeat').title = '반복: 꺼짐';
   if (current?.id === first.id) audio.currentTime = 0;
   await playTrack(first, list);
-  toast('전체 '+list.length+'개 음원을 랜덤 재생합니다.');
+  toast('팟캐스트를 제외한 '+list.length+'곡을 랜덤 재생합니다.');
 }
 $('#shuffle-all').onclick = guarded(playAllRandom);
 $('#hero-play').onclick = guarded(async () => { const artistTracks=tracks.filter(t=>t.artist==='이승환'); if (!artistTracks.length) return searchArtist('이승환 official'); await playTrack(artistTracks[0],artistTracks); });
