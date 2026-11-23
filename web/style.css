@@ -10,3 +10,5 @@
 #library-section .section-heading{flex-wrap:wrap;gap:14px}#add-visible-playlist{padding:9px 13px;font-size:10px;margin-left:4px}@media(max-width:760px){#add-visible-playlist{margin-left:auto;font-size:9px;padding:8px 10px}}
 
 #playlists{min-height:0;overflow-y:auto;flex:1;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#4a563b transparent}.sidebar>nav,.sidebar-bottom{flex-shrink:0}
+
+.shuffle-all{display:flex;align-items:center;gap:10px;width:100%;flex-shrink:0;margin:12px 0 4px;padding:12px 14px;border:1px solid #53613d;border-radius:10px;background:#29351d;color:#d5f480;font-size:14px;font-weight:600;text-align:left;cursor:pointer}.shuffle-all:hover{background:#354627}.shuffle-all span{font-size:22px}
